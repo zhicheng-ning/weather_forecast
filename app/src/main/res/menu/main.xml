@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/showDetail"
+        android:title="气象指数" />
+    <item
+        android:id="@+id/about"
+        android:title="关于" />
+    <item
+        android:id="@+id/exit"
+        android:title="退出软件" />
+</menu>

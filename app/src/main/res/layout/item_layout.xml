@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:background="#5AFFFFFF"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tv_date_title"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:paddingLeft="10dp"
+                android:text="15日 星期一"
+                android:textColor="#EA5D4683" />
+
+            <TextView
+                android:id="@+id/tv_high_temp"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:paddingLeft="10dp"
+                android:text="最高温：20℃"
+                android:textColor="#EA5D4683" />
+
+            <TextView
+                android:id="@+id/tv_low_temp"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:paddingLeft="10dp"
+                android:text="最低温：19℃"
+                android:textColor="#EA5D4683" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.5"
+                    android:gravity="center_vertical"
+                    android:paddingLeft="10dp"
+                    android:text="白天"
+                    android:textColor="#EA5D4683" />
+
+                <TextView
+                    android:id="@+id/tv_day_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:text="图标"
+                    android:textColor="#EA5D4683"
+                    android:textSize="24sp"
+                    android:textStyle="normal" />
+
+                <TextView
+                    android:id="@+id/tv_day_type"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.5"
+                    android:gravity="center"
+                    android:text="多云"
+                    android:textColor="#EA5D4683"/>
+                <TextView
+                    android:id="@+id/tv_day_wind_force"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical"
+                    android:text="风力：3-4级"
+                    android:paddingLeft="10dp"
+                    android:textColor="#EA5D4683"/>
+
+                <TextView
+                    android:id="@+id/tv_day_wind_dir"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical"
+                    android:text="风向：西南风"
+                    android:paddingLeft="10dp"
+                    android:textColor="#EA5D4683"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.5"
+                    android:gravity="center_vertical"
+                    android:paddingLeft="10dp"
+                    android:text="晚上"
+                    android:textColor="#EA5D4683" />
+
+                <TextView
+                    android:id="@+id/tv_night_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:text="图标"
+                    android:textColor="#EA5D4683"
+                    android:textSize="24sp"
+                    android:textStyle="normal" />
+
+                <TextView
+                    android:id="@+id/tv_night_type"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.5"
+                    android:gravity="center"
+                    android:text="小雨"
+                    android:textColor="#EA5D4683"/>
+                <TextView
+                    android:id="@+id/tv_night_wind_force"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical"
+                    android:text="风力：3-4级"
+                    android:paddingLeft="10dp"
+                    android:textColor="#EA5D4683"/>
+
+                <TextView
+                    android:id="@+id/tv_night_wind_dir"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical"
+                    android:text="风向：西南风"
+                    android:paddingLeft="10dp"
+                    android:textColor="#EA5D4683"/>
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+</LinearLayout>
