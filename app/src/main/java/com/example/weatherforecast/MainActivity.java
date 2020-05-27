@@ -236,6 +236,7 @@ public class MainActivity extends AppCompatActivity {
         new weatherTask().execute();
     }
 
+
     private void setSpinner() {
         provinceSpinner = findViewById(R.id.spin_province);
         citySpinner = findViewById(R.id.spin_city);
