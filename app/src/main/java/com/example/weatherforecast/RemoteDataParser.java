@@ -31,17 +31,17 @@ public class RemoteDataParser {
      * @return 描述该城市天气的xml文件
      */
     public static String getRemoteData(String city_code) {
+        BufferedReader reader=null;
         try {
             URL url = new URL(String.format(WTHRCDN, city_code));
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+             reader= new BufferedReader(new InputStreamReader(connection.getInputStream()));
             StringBuffer res = new StringBuffer(1024);
             String temp = "";
-
             while ((temp = reader.readLine()) != null) {
                 res.append(temp).append('\n');
             }
-            reader.close();
+
             return res.toString();
         } catch (MalformedURLException e) {
             e.printStackTrace();
@@ -49,6 +49,15 @@ public class RemoteDataParser {
         } catch (IOException e) {
             e.printStackTrace();
             return null;
+        }finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
         }
     }
 
@@ -204,6 +213,14 @@ public class RemoteDataParser {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+        }finally {
+            if (inputStream != null) {
+                try {
+                    inputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
         return weatherInfo;
     }

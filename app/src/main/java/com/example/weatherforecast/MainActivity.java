@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
@@ -14,6 +15,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
@@ -26,7 +28,9 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
@@ -50,8 +54,10 @@ public class MainActivity extends AppCompatActivity {
 
     private String[] weatherIndex = new String[]{};
 
-    private List<CountryCode> codeList;
-
+    private List<CountryCode> codeList=new ArrayList<>();
+    private String[] province = new String[]{"北京","江西"};//{"北京","江西"}
+    private String[][] city = new String[][]{{"北京","海淀"},{"南昌","赣州"}};//{{"北京","海淀"},{"南昌","赣州"}}
+    private String[][][] country = new String[][][]{{{"北京"},{"海淀"}},{{"南昌","新建","南昌县"},{"赣县","崇义"}}};//{{{"北京"},{"海淀"}},{{"南昌","新建","南昌县"},{"赣县","崇义"}}}
 
     private Spinner provinceSpinner = null;  //省级（省、直辖市）
     private Spinner citySpinner = null;     //地级市
@@ -59,7 +65,8 @@ public class MainActivity extends AppCompatActivity {
     ArrayAdapter<String> provinceAdapter = null;  //省级适配器
     ArrayAdapter<String> cityAdapter = null;    //地级适配器
     ArrayAdapter<String> countyAdapter = null;    //县级适配器
-    static int provincePosition = 3;
+    int provincePosition = 0;//记录省号
+    int cityPosition=0;//记录市号
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
@@ -128,90 +135,189 @@ public class MainActivity extends AppCompatActivity {
 
         mListView = findViewById(R.id.list_forecast);
 
-
-        /*try {
-            InputStream codeStream = getAssets().open("city_code.txt");
-            BufferedReader reader = new BufferedReader(new InputStreamReader(codeStream));
-            String line = "";
-            String[] arry;
-            codeList = new ArrayList<>();
-            CountryCode tempCode=null;
-            while ((line = reader.readLine()) != null) {
-                arry = line.split("\t");
-                tempCode = new CountryCode();
-                tempCode.setProvince(arry[0]);
-                tempCode.setCity(arry[1]);
-                tempCode.setCountry(arry[2]);
-                tempCode.setCode(arry[3]);
-                codeList.add(tempCode);
-            }
-            for (int i = 0; i < codeList.size(); i++) {
-                Log.d("codeList:", codeList.get(i).getCode());
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-*/
-        new weatherTask().execute();
-        //            获得城市代码列表对象
+//        读入城市代码文件，解析数据后存入到list集合codeList中
+        InputStream codeStream = null;
+        BufferedReader reader=null;
+        CountryCode tempCode = null;
+        //
+        int cnt=0,indexProvince=0,indexCity=0,indexCountry=0;
+        //
         try {
-            InputStream codeStream = getAssets().open("city_code.txt");
-            BufferedReader reader = new BufferedReader(new InputStreamReader(codeStream));
-            String line = "";
+            codeStream = MainActivity.this.getResources().getAssets().open("city_code.txt");
+             reader= new BufferedReader(new InputStreamReader(codeStream));
+            String line = " ";
             String[] array;
-            codeList = new ArrayList<>();
-            CountryCode tempCode=null;
-
-            String[] province = new String[]{};
-            String[][] city = new String[][]{{}};
-            String[][][] country = new String[][][]{{{}}};
-
-
-            Set<String> citySet = new HashSet<>();
-            Set<String> countrySet = new HashSet<>();
             while ((line = reader.readLine()) != null) {
-                array = line.split("\t");
                 tempCode = new CountryCode();
+                array = line.split("\t");
                 tempCode.setProvince(array[0]);
                 tempCode.setCity(array[1]);
                 tempCode.setCountry(array[2]);
                 tempCode.setCode(array[3]);
                 codeList.add(tempCode);
+/*//
+                if(cnt==0){//不是同一个省
+                    province[indexProvince]=codeList.get(cnt).getProvince();
+                    city[indexProvince][indexCity] = codeList.get(cnt).getCity();
+                    country[indexProvince][indexCity][indexCountry] = codeList.get(cnt).getCountry();
+                } else if (codeList.get(cnt).getProvince().equals(codeList.get(cnt - 1).getProvince()) == false) {//不是同一个省
+                    indexProvince++;
+                    province[indexProvince]=codeList.get(cnt).getProvince();
+                    indexCity=0;
+                    indexCountry=0;
+                    city[indexProvince][indexCity] = codeList.get(cnt).getCity();
+                    country[indexProvince][indexCity][indexCountry] = codeList.get(cnt).getCountry();
+                } else {
+                    if(codeList.get(cnt).getCity().equals(codeList.get(cnt-1).getCity())==false){//不是同一个县
+                        indexCity++;
+                        city[indexProvince][indexCity] = codeList.get(cnt).getCity();
+                        indexCountry=0;
+                        country[indexProvince][indexCity][indexCountry] = codeList.get(cnt).getCountry();
+                    }else {//同一个县
+                        indexCountry++;
+                        country[indexProvince][indexCity][indexCountry] = codeList.get(cnt).getCountry();
+                    }
+                }
+            cnt++;*/
             }
-            Log.d("codeListNum", String.valueOf(codeList.size()));
-            int cnt1=0;//表示省的数量
-            for (int i = 0; i < codeList.size(); i++) {
-                //出现新的省份
-                if (i == 0 || !codeList.get(i).getProvince().equals(codeList.get(i - 1).getProvince())) {
-                    citySet.clear();//新的省，因此清空所以的市
-                    countrySet.clear();// 新的省，所以清空所有的县
+        } catch (IOException e) {
+            e.printStackTrace();
+        }finally {
+            if(reader!=null){
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (codeStream != null) {
+                try {
+                    codeStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+/*
+// 为  province ，city, country数组赋值
+        Set<String> citySet = new LinkedHashSet<>();
+        Set<String> countrySet = new LinkedHashSet<>();
+        int provinceCnt=0;
+        for (int i = 0; i < codeList.size(); i++) {
+//            出现新的省份
+            if (i == 0 || !codeList.get(i).getProvince().equals(codeList.get(i - 1).getProvince())) {
+                citySet.clear();//新的省，清空二级列表中的市
+                countrySet.clear();//清空县
 
-                    citySet.add(codeList.get(i).getCity());//添加市
-                    city[cnt1][citySet.size()-1] = codeList.get(i).getCity();//赋值市
-                    countrySet.add(codeList.get(i).getCountry());//添加县
-                    country[cnt1][citySet.size() - 1][countrySet.size() - 1] = codeList.get(i).getCountry();//赋值县
-                    province[cnt1++] = codeList.get(i).getProvince();//赋值省
+                citySet.add(codeList.get(i).getCity());
+                city[provinceCnt][citySet.size() - 1] = codeList.get(i).getCity();//赋值市
+                countrySet.add(codeList.get(i).getCountry());
+                country[provinceCnt][citySet.size() - 1][countrySet.size() - 1] = codeList.get(i).getCountry();//赋值县
+                province[provinceCnt++] = codeList.get(i).getProvince();
+            } else {//同一省份
+                citySet.add(codeList.get(i).getCity());
+                city[provinceCnt][citySet.size()-1]=codeList.get(i).getCity();
+                if (codeList.get(i).getCity().equals(codeList.get(i - 1).getCity())) {
+                    //同一个市
+                    countrySet.add(codeList.get(i).getCountry());
+                    country[provinceCnt][citySet.size() - 1][countrySet.size() - 1] = codeList.get(i).getCountry();
+                } else {
+                    countrySet.clear();
+                    countrySet.add(codeList.get(i).getCountry());
+                    country[provinceCnt][citySet.size() - 1][countrySet.size() - 1] = codeList.get(i).getCountry();
+                }
+            }
+        }*/
 
-                }else {
-                    citySet.add(codeList.get(i).getCity());//添加市
-                    city[cnt1][citySet.size()-1] = codeList.get(i).getCity();//赋值市
-//                        同一个市
-                    if (codeList.get(i).getCity().equals(codeList.get(i - 1).getCity())) {
-                        countrySet.add(codeList.get(i).getCountry());//添加县
-                        country[cnt1][citySet.size() - 1][countrySet.size() - 1] = codeList.get(i).getCountry();//赋值县
-                    } else {//非同一个市,清空所有县
-                        countrySet.clear();
-                        countrySet.add(codeList.get(i).getCountry());//添加县
-                        country[cnt1][citySet.size() - 1][countrySet.size() - 1] = codeList.get(i).getCountry();//赋值县
+//        设置spinner
+        setSpinner();
+//        异步任务根据城市代码获取天气数据
+        new weatherTask().execute();
+    }
+
+    private void setSpinner() {
+        provinceSpinner = findViewById(R.id.spin_province);
+        citySpinner = findViewById(R.id.spin_city);
+        countySpinner = findViewById(R.id.spin_county);
+        //绑定适配器和值
+        provinceAdapter = new ArrayAdapter<String>(MainActivity.this,
+                android.R.layout.simple_spinner_item, province);
+        provinceSpinner.setAdapter(provinceAdapter);
+        provinceSpinner.setSelection(0, true);  //设置默认选中项，此处为默认选中第0个值
+
+        cityAdapter = new ArrayAdapter<String>(MainActivity.this,
+                android.R.layout.simple_spinner_item, city[0]);
+        citySpinner.setAdapter(cityAdapter);
+        citySpinner.setSelection(0, true);  //默认选中第0个
+
+        countyAdapter = new ArrayAdapter<String>(MainActivity.this,
+                android.R.layout.simple_spinner_item, country[0][0]);
+        countySpinner.setAdapter(countyAdapter);
+        countySpinner.setSelection(0, true);
+        //省级下拉框监听
+        provinceSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+
+            // 表示选项被改变的时候触发此方法，主要实现办法：动态改变地级适配器的绑定值
+            @Override
+            public void onItemSelected(AdapterView<?> arg0, View arg1, int position, long arg3) {
+                //position为当前省级选中的值的序号
+
+                //将地级适配器的值改变为city[position]中的值
+                cityAdapter = new ArrayAdapter<String>(
+                        MainActivity.this, android.R.layout.simple_spinner_item, city[position]);
+                // 设置二级下拉列表的选项内容适配器
+                citySpinner.setAdapter(cityAdapter);
+                provincePosition = position;    //记录当前省级序号，留给下面修改县级适配器时用
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> arg0) {
+
+            }
+
+        });
+
+        //地级下拉监听
+        citySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+
+            @Override
+            public void onItemSelected(AdapterView<?> arg0, View arg1,
+                                       int position, long arg3) {
+                countyAdapter = new ArrayAdapter<String>(MainActivity.this,
+                        android.R.layout.simple_spinner_item, country[provincePosition][position]);
+                countySpinner.setAdapter(countyAdapter);
+                cityPosition=position;//记录当前市号
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> arg0) {
+
+            }
+        });
+
+//        县级监听
+        countySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String countryName=country[provincePosition][cityPosition][position];
+                for(int i=0;i<codeList.size();i++){
+                    CountryCode cc=codeList.get(i);
+                    //选择了县
+                    if(cc.getProvince().equals(province[provincePosition])
+                            &&cc.getCity().equals(city[provincePosition][cityPosition])
+                            &&cc.getCountry().equals(countryName)){
+                        default_city_code=cc.getCode();
+//                        更新界面
+                        new weatherTask().execute();
                     }
                 }
             }
-            Log.d("provinceNum:", String.valueOf(province.length));
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
 
+            }
+        });
     }
 
 
@@ -232,65 +338,6 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected WeatherInfo doInBackground(WeatherInfo... weatherInfos) {
             WeatherInfo weatherInfo = RemoteDataParser.parseRemoteData(default_city_code);
-
-/*//            获得城市代码列表对象
-            try {
-                InputStream codeStream = getAssets().open("city_code.txt");
-                BufferedReader reader = new BufferedReader(new InputStreamReader(codeStream));
-                String line = "";
-                String[] array;
-                codeList = new ArrayList<>();
-                CountryCode tempCode=null;
-
-                String[] province = new String[]{};
-                String[][] city = new String[][]{{}};
-                String[][][] country = new String[][][]{{{}}};
-
-                Set<String> provinceSet = new HashSet();
-                Set<String> citySet = new HashSet();
-                Set<String> countrySet = new HashSet();
-                while ((line = reader.readLine()) != null) {
-                    array = line.split("\t");
-                    tempCode = new CountryCode();
-                    tempCode.setProvince(array[0]);
-                    tempCode.setCity(array[1]);
-                    tempCode.setCountry(array[2]);
-                    tempCode.setCode(array[3]);
-                    codeList.add(tempCode);
-                }
-                int cnt1=0;//表示省的数量
-                for (int i = 0; i < codeList.size(); i++) {
-                    //出现新的省份
-                    if (i == 0 || codeList.get(i).getProvince() != codeList.get(i - 1).getProvince()) {
-                        citySet.clear();//新的省，因此清空所以的市
-                        countrySet.clear();// 新的省，所以清空所有的县
-
-                        citySet.add(codeList.get(i).getCity());//添加市
-                        city[cnt1][citySet.size()-1] = codeList.get(i).getCity();//赋值市
-                        countrySet.add(codeList.get(i).getCountry());//添加县
-                        country[cnt1][citySet.size() - 1][countrySet.size() - 1] = codeList.get(i).getCountry();//赋值县
-                        province[cnt1++] = codeList.get(i).getProvince();//赋值省
-
-                    }else {
-                        citySet.add(codeList.get(i).getCity());//添加市
-                        city[cnt1][citySet.size()-1] = codeList.get(i).getCity();//赋值市
-//                        同一个市
-                        if (codeList.get(i).getCity() == codeList.get(i - 1).getCity()) {
-                            countrySet.add(codeList.get(i).getCountry());//添加县
-                            country[cnt1][citySet.size() - 1][countrySet.size() - 1] = codeList.get(i).getCountry();//赋值县
-                        } else {//非同一个市,清空所有县
-                            countrySet.clear();
-                            countrySet.add(codeList.get(i).getCountry());//添加县
-                            country[cnt1][citySet.size() - 1][countrySet.size() - 1] = codeList.get(i).getCountry();//赋值县
-                        }
-                    }
-                }
-                Log.d("provinceNum:", String.valueOf(province.length));
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }*/
-
             return weatherInfo;
         }
 
@@ -335,8 +382,6 @@ public class MainActivity extends AppCompatActivity {
 //            隐藏进度条，显示主界面
                 findViewById(R.id.loader).setVisibility(View.GONE);
                 findViewById(R.id.mainContainer).setVisibility(View.VISIBLE);
-
-                //
 
 
             } catch (Exception e) {
