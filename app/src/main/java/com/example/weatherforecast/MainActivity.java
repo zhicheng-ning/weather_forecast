@@ -235,8 +235,6 @@ public class MainActivity extends AppCompatActivity {
 //        异步任务根据城市代码获取天气数据
         new weatherTask().execute();
     }
-
-
     private void setSpinner() {
         provinceSpinner = findViewById(R.id.spin_province);
         citySpinner = findViewById(R.id.spin_city);
